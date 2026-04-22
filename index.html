@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E Health Map</title>
+
+  <!-- External Libraries -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════════════════════════════════
+       NAVIGATION
+  ══════════════════════════════════════ -->
+  <nav class="nav-wrap" id="main-nav">
+
+    <a class="nav-logo" href="#home">
+      <div class="logo-icon">
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <div class="plus-badge">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#4DA6A6" stroke-width="4">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </div>
+      </div>
+      <span>E <span class="logo-italic">Health</span> Map</span>
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#home"      data-page="home">Dashboard</a></li>
+      <li><a href="#routine"   data-page="routine">Routine Check</a></li>
+      <li><a href="#insights"  data-page="insights">Insights</a></li>
+      <li><a href="#tips"      data-page="tips">Tips</a></li>
+      <li><a href="#gp-finder" data-page="gp-finder">GP Finder</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <div class="nav-divider"></div>
+      <button class="theme-btn" id="theme-toggle" title="Toggle theme">
+        <svg class="icon" id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <div id="auth-nav-slot"></div>
+    </div>
+
+    <div class="mobile-actions">
+      <button class="theme-btn" id="theme-toggle-m" title="Toggle theme">
+        <svg class="icon" id="theme-icon-m" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <button class="hamburger-btn" id="hamburger">
+        <svg class="icon" id="ham-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="6"  x2="21" y2="6"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#home"      data-page="home">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Dashboard
+      </a>
+      <a href="#routine"   data-page="routine">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Routine Check
+      </a>
+      <a href="#insights"  data-page="insights">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Insights
+      </a>
+      <a href="#tips"      data-page="tips">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+        Tips
+      </a>
+      <a href="#gp-finder" data-page="gp-finder">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        GP Finder
+      </a>
+      <div class="divider"></div>
+      <div id="mobile-auth-slot"></div>
+    </div>
+  </nav>
+
+
+  <!-- ══════════════════════════════════════
+       MAIN — ALL PAGES LIVE HERE AS STATIC HTML
+  ══════════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- ─────────────────────────
+         PAGE: HOME / DASHBOARD
+    ───────────────────────────── -->
+    <div id="page-home" class="page container">
+
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="blob blob-teal"></div>
+        <div class="blob blob-purple blob-purple-hero"></div>
+        <!-- <div class="dna-helix" id="dna-hero"></div> -->
+
+        <div class="hero-grid">
+          <div>
+            <div class="section-badge hero-badge">
+              <div class="shimmer"></div>
+              <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M5 3l.5 1.5L7 5l-1.5.5L5 7l-.5-1.5L3 5l1.5-.5L5 3z"/></svg>
+              <span>Interactive Health Intelligence</span>
+            </div>
+            <h1 class="hero-h1">Track your habits.<br><span class="text-primary">Understand your health.</span></h1>
+            <p class="hero-sub">Gain personalized insights into how your daily routines influence your long-term brain and body wellness. Educational, supportive, and non-diagnostic.</p>
+            <div class="hero-btns">
+              <a href="#routine" class="btn-primary">
+                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Start Routine Check
+              </a>
+              <a href="#about" class="btn-secondary">Learn More</a>
+            </div>
+          </div>
+
+          <div class="hero-img-col">
+            <div class="hero-img-wrap">
+              <img src="https://picsum.photos/seed/wellness-hero/800/800" alt="Health and Wellness" referrerpolicy="no-referrer">
+            </div>
+            <div class="hero-bounce-block"></div>
+            <div class="hero-glow"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature Cards -->
+      <section class="feature-section">
+        <div class="bio-pattern feature-bg-pattern"></div>
+        <div class="feature-cards">
+          <div class="feature-card slide-up">
+            <div class="feature-card-img">
+              <img src="https://picsum.photos/seed/tracker/400/250" alt="Smart Tracker" referrerpolicy="no-referrer">
+              <div class="feature-card-overlay"></div>
+              <div class="feature-card-icon feature-icon-blue">
+                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+            </div>
+            <div class="feature-card-body">
+              <h3>Smart Tracker</h3>
+              <p>Simple, daily inputs for sleep, water, and activity.</p>
+            </div>
+          </div>
+
+          <div class="feature-card slide-up">
+            <div class="feature-card-img">
+              <img src="https://picsum.photos/seed/insights/400/250" alt="Behavior Insights" referrerpolicy="no-referrer">
+              <div class="feature-card-overlay"></div>
+              <div class="feature-card-icon feature-icon-teal">
+                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l1.5-3 2 5 1.5-3h5.28"/></svg>
+              </div>
+            </div>
+            <div class="feature-card-body">
+              <h3>Behavior Insights</h3>
+              <p>Understand trends and hidden patterns in your data.</p>
+            </div>
+          </div>
+
+          <div class="feature-card slide-up">
+            <div class="feature-card-img">
+              <img src="https://picsum.photos/seed/tips/400/250" alt="Supportive Tips" referrerpolicy="no-referrer">
+              <div class="feature-card-overlay"></div>
+              <div class="feature-card-icon feature-icon-navy">
+                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+              </div>
+            </div>
+            <div class="feature-card-body">
+              <h3>Supportive Tips</h3>
+              <p>Personalized suggestions backed by health guidelines.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- How It Works -->
+      <section class="how-section">
+        <div class="how-pulse-ring"></div>
+        <div class="how-grid">
+          <div>
+            <h2 class="how-title">How it works</h2>
+            <div class="how-steps">
+              <div class="how-step">
+                <span class="how-step-num">01</span>
+                <div>
+                  <h4>Log your daily routine</h4>
+                  <p>Spend 2 minutes recording your sleep, water, and activity.</p>
+                </div>
+              </div>
+              <div class="how-step">
+                <span class="how-step-num">02</span>
+                <div>
+                  <h4>Review your dashboard</h4>
+                  <p>See your habit scores and identify areas of improvement.</p>
+                </div>
+              </div>
+              <div class="how-step">
+                <span class="how-step-num">03</span>
+                <div>
+                  <h4>Get personalized tips</h4>
+                  <p>Follow gentle, evidence-based suggestions for a healthier you.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-panel">
+            <div class="preview-panel-header">
+              <span class="preview-panel-title">Routine Highlights</span>
+              <span class="preview-live-badge">Live Preview</span>
+            </div>
+            <div class="preview-bar-wrap">
+              <div class="preview-bar-labels"><span>Sleep Quality</span><span>85%</span></div>
+              <div class="preview-bar-bg"><div class="preview-bar-fill preview-bar-teal" data-width="85"></div></div>
+            </div>
+            <div class="preview-bar-wrap">
+              <div class="preview-bar-labels"><span>Hydration</span><span>62%</span></div>
+              <div class="preview-bar-bg"><div class="preview-bar-fill preview-bar-blue" data-width="62"></div></div>
+            </div>
+            <div class="preview-bar-wrap">
+              <div class="preview-bar-labels"><span>Active Minutes</span><span>45%</span></div>
+              <div class="preview-bar-bg"><div class="preview-bar-fill preview-bar-accent" data-width="45"></div></div>
+            </div>
+            <a href="#routine" class="preview-try-btn">
+              Try It Now
+              <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+    </div><!-- /#page-home -->
+
+
+    <!-- ─────────────────────────
+         PAGE: ROUTINE CHECK
+    ───────────────────────────── -->
+    <div id="page-routine" class="page container">
+      <header class="page-header">
+        <h1>Routine Check</h1>
+        <p>Reflect on your last 24 hours. Consistent logging helps build a clearer picture of your wellness trends.</p>
+      </header>
+
+      <div class="routine-grid">
+        <!-- Input Form -->
+        <div class="card routine-form-card">
+          <div class="routine-form-grid">
+
+            <div class="form-section">
+              <div class="section-label section-label-primary">
+                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                Sleep Routine
+              </div>
+              <div class="time-grid">
+                <div>
+                  <span class="mini-label">Bedtime</span>
+                  <input type="time" class="form-input" id="f-sleepStart" value="22:30">
+                </div>
+                <div>
+                  <span class="mini-label">Wake Up</span>
+                  <input type="time" class="form-input" id="f-sleepEnd" value="06:30">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-label section-label-blue">
+                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                Hydration
+              </div>
+              <div class="time-grid">
+                <div>
+                  <span class="mini-label">Water (L)</span>
+                  <input type="number" class="form-input" id="f-water" value="2" min="0" max="10" step="0.1">
+                </div>
+                <div>
+                  <span class="mini-label">Meals</span>
+                  <input type="number" class="form-input" id="f-meals" value="3" min="0" max="12">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-label section-label-accent">
+                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Active Life
+              </div>
+              <div class="time-grid">
+                <div>
+                  <span class="mini-label">Exercise (min)</span>
+                  <input type="number" class="form-input" id="f-exercise" value="30" min="0" max="1440">
+                </div>
+                <div>
+                  <span class="mini-label">Work (hrs)</span>
+                  <input type="number" class="form-input" id="f-workHours" value="8" min="0" max="24">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-label section-label-orange">
+                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Mental State
+              </div>
+              <div class="time-grid">
+                <div>
+                  <span class="mini-label">Digital (hrs)</span>
+                  <input type="number" class="form-input" id="f-screenTime" value="4" min="0" max="24">
+                </div>
+                <div>
+                  <span class="mini-label">Stress 1-10: <span id="stress-val">5</span></span>
+                  <input type="range" id="f-stress" min="1" max="10" value="5">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Score + Submit -->
+          <div class="form-footer">
+            <div class="score-ring-wrap">
+              <div class="score-ring">
+                <svg width="80" height="80" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="currentColor" stroke-width="5" class="ring-bg"/>
+                  <circle id="ring-progress" cx="40" cy="40" r="34" fill="none" stroke="#4DA6A6" stroke-width="5"
+                    stroke-dasharray="213.6" stroke-dashoffset="50"
+                    stroke-linecap="round"/>
+                </svg>
+                <div class="score-ring-center">
+                  <span class="score-ring-num" id="ring-score">75</span>
+                  <span class="score-ring-lbl">Score</span>
+                </div>
+              </div>
+              <div class="habit-condition-icon" id="habit-condition-icon">
+                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+              <div>
+                <span class="habit-quality-label">Habit Quality</span>
+                <span id="ring-label" class="ring-label-text">Good</span>
+              </div>
+            </div>
+            <button class="submit-btn idle" id="routine-submit">
+              Commit Daily Entry
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="routine-sidebar">
+          <div class="card routine-history-card">
+            <div class="history-header">
+              <h3>Recent Logs</h3>
+              <button class="reset-btn" id="open-reset">
+                <svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                Reset Data
+              </button>
+            </div>
+            <div id="history-list" class="custom-scrollbar history-scroll">
+              <div class="history-empty">
+                <svg class="icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                <p class="history-empty-text">Ready for first log</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="tip-card">
+            <h4 class="tip-card-title">
+              Efficiency Tips
+              <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </h4>
+            <div class="tip-item-plain">
+              <p class="tip-item-title">Circadian Anchor</p>
+              <p class="tip-item-body">Consistent bedtime (within 30 mins) is the #1 predictor of sustained next-day focus.</p>
+            </div>
+            <div class="tip-item-plain tip-item-plain-bordered">
+              <p class="tip-item-title">The 20-20-20 Rule</p>
+              <p class="tip-item-body">Every 20 mins, look 20 feet away for 20 seconds to reduce digital eye strain.</p>
+            </div>
+            <div class="tip-item-plain tip-item-plain-bordered">
+              <p class="tip-item-title">Metabolic Spark</p>
+              <p class="tip-item-body">Drink 500ml of water within 30 mins of waking to jumpstart cellular hydration.</p>
+            </div>
+          </div>
+
+          <div class="card scoring-guide-card">
+            <h3 class="scoring-guide-title">Scoring Guide</h3>
+            <div class="range-guide-item">
+              <div class="range-icon range-icon-optimal">
+                <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/></svg>
+              </div>
+              <div>
+                <div class="range-label-row"><span class="range-name range-name-optimal">Optimal</span><span class="range-score">86-100</span></div>
+                <p class="range-desc">Peak harmony between systems.</p>
+              </div>
+            </div>
+            <div class="range-guide-item">
+              <div class="range-icon range-icon-good">
+                <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+              </div>
+              <div>
+                <div class="range-label-row"><span class="range-name range-name-good">Good</span><span class="range-score">71-85</span></div>
+                <p class="range-desc">Solid routine with minor gaps.</p>
+              </div>
+            </div>
+            <div class="range-guide-item">
+              <div class="range-icon range-icon-fair">
+                <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+              <div>
+                <div class="range-label-row"><span class="range-name range-name-fair">Fair</span><span class="range-score">51-70</span></div>
+                <p class="range-desc">Inconsistent inputs detected.</p>
+              </div>
+            </div>
+            <div class="range-guide-item">
+              <div class="range-icon range-icon-poor">
+                <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+              </div>
+              <div>
+                <div class="range-label-row"><span class="range-name range-name-poor">Poor</span><span class="range-score">31-50</span></div>
+                <p class="range-desc">Significant routine disruption.</p>
+              </div>
+            </div>
+            <div class="range-guide-item range-guide-last">
+              <div class="range-icon range-icon-verypoor">
+                <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div>
+                <div class="range-label-row"><span class="range-name range-name-verypoor">Very Poor</span><span class="range-score">0-30</span></div>
+                <p class="range-desc">Critical depletion; prioritize rest.</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div><!-- /#page-routine -->
+
+
+    <!-- ─────────────────────────
+         PAGE: HEALTH INSIGHTS
+    ───────────────────────────── -->
+    <div id="page-insights" class="page container">
+      <header class="page-header">
+        <h1>Health Awareness</h1>
+        <p>Understanding the link between daily habits and common medical conditions.</p>
+      </header>
+
+      <div class="insights-grid">
+        <div class="insight-card slide-up">
+          <div class="insight-card-header">
+            <div class="insight-icon">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </div>
+            <h3>Type 2 Diabetes</h3>
+          </div>
+          <p>Type 2 diabetes is a condition where the body cannot properly use insulin, leading to high blood sugar levels. Lifestyle factors like diet and exercise play a crucial role. Maintaining a healthy weight and staying active may increase insulin sensitivity and lower blood sugar levels.</p>
+          <a href="https://www.who.int/news-room/fact-sheets/detail/diabetes" target="_blank" rel="noopener noreferrer" class="insight-link">
+            Learn more at WHO
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+
+        <div class="insight-card slide-up">
+          <div class="insight-card-header">
+            <div class="insight-icon">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </div>
+            <h3>Heart Disease</h3>
+          </div>
+          <p>Cardiovascular diseases are the leading cause of death globally. High blood pressure and high cholesterol can be linked to heart issues. A diet low in saturated fats and regular aerobic exercise may reduce systemic inflammation and strengthen the heart muscle.</p>
+          <a href="https://www.who.int/health-topics/cardiovascular-diseases" target="_blank" rel="noopener noreferrer" class="insight-link">
+            Learn more at WHO
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+
+        <div class="insight-card slide-up">
+          <div class="insight-card-header">
+            <div class="insight-icon">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </div>
+            <h3>Stroke</h3>
+          </div>
+          <p>A stroke occurs when blood flow to the brain is interrupted. Chronic stress and poor sleep can be linked to hypertension, which is a major stroke risk factor. Awareness of blood pressure and regular check-ups may significantly lower the long-term risk.</p>
+          <a href="https://www.who.int/health-topics/cardiovascular-diseases" target="_blank" rel="noopener noreferrer" class="insight-link">
+            Learn more at WHO
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+
+        <div class="insight-card slide-up">
+          <div class="insight-card-header">
+            <div class="insight-icon">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </div>
+            <h3>High Blood Pressure</h3>
+          </div>
+          <p>Often called the 'silent killer', high blood pressure affects millions. Excessive salt intake and lack of physical activity can be linked to increased arterial pressure. Reducing sodium and managing stress may help maintain optimal cardiovascular health.</p>
+          <a href="https://www.who.int/health-topics/hypertension" target="_blank" rel="noopener noreferrer" class="insight-link">
+            Learn more at WHO
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+
+        <div class="insight-card slide-up">
+          <div class="insight-card-header">
+            <div class="insight-icon">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </div>
+            <h3>Mental Health</h3>
+          </div>
+          <p>Mental well-being is as important as physical health. Chronic stress and poor sleep may increase risk of anxiety and depression. Regular movement, hydration, and setting screen-time boundaries can be linked to improved mood and cognitive resilience.</p>
+          <a href="https://www.who.int/news-room/fact-sheets/detail/mental-health-strengthening-our-response" target="_blank" rel="noopener noreferrer" class="insight-link">
+            Learn more at WHO
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="disclaimer-notice">
+        <div class="disclaimer-icon">
+          <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        </div>
+        <div>
+          <h4 class="disclaimer-title">Medical Disclaimer</h4>
+          <p>The information on this page is for general awareness only. Always seek the advice of your physician or other qualified health provider.</p>
+        </div>
+      </div>
+    </div><!-- /#page-insights -->
+
+
+    <!-- ─────────────────────────
+         PAGE: TIPS
+    ───────────────────────────── -->
+    <div id="page-tips" class="page container">
+      <header class="tips-page-header">
+        <div class="section-badge">Actionable Advice</div>
+        <h1>Health Enhancement Tips</h1>
+        <p>Small, daily adjustments lead to significant long-term shifts in your energy and clarity.</p>
+        <div class="tips-hero-img-wrap">
+          <img src="https://picsum.photos/seed/healthy-living/1200/600" alt="Healthy Living" referrerpolicy="no-referrer">
+          <div class="tips-hero-gradient"></div>
+          <div class="tips-hero-tags">
+            <span class="tips-tag">#Vitality</span>
+            <span class="tips-tag">#Routine</span>
+            <span class="tips-tag">#HealthMap</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="tips-grid">
+        <div class="tip-group slide-up">
+          <div class="tip-group-header">
+            <div class="tip-icon-wrap tip-icon-sleep">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </div>
+            <h3>Improve Sleep</h3>
+          </div>
+          <div class="tips-list">
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Stick to a consistent sleep-wake schedule, even on weekends.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Ensure your bedroom is dark, quiet, and cool.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Avoid heavy meals and caffeine at least 4-6 hours before bedtime.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Try a 10-minute winding down ritual like reading or meditation.</p></div>
+          </div>
+          <div class="tip-footer"><span class="tip-footer-goal">✦ Daily Goal</span><span class="tip-footer-impact">High Impact</span></div>
+        </div>
+
+        <div class="tip-group slide-up">
+          <div class="tip-group-header">
+            <div class="tip-icon-wrap tip-icon-hydration">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            </div>
+            <h3>Drink More Water</h3>
+          </div>
+          <div class="tips-list">
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Carry a reusable water bottle with you throughout the day.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Set a phone reminder to drink water every 2 hours.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Drink a full glass of water immediately after waking up.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Eat more water-rich snacks like cucumber and watermelon.</p></div>
+          </div>
+          <div class="tip-footer"><span class="tip-footer-goal">✦ Daily Goal</span><span class="tip-footer-impact">High Impact</span></div>
+        </div>
+
+        <div class="tip-group slide-up">
+          <div class="tip-group-header">
+            <div class="tip-icon-wrap tip-icon-activity">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <h3>Move Daily</h3>
+          </div>
+          <div class="tips-list">
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Take a 10-minute brisk walk after lunch to aid digestion.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Use stairs instead of elevators whenever possible.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Set an alarm to stand up and stretch every 60 minutes.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Try a fun physical activity you enjoy, like dancing or cycling.</p></div>
+          </div>
+          <div class="tip-footer"><span class="tip-footer-goal">✦ Daily Goal</span><span class="tip-footer-impact">High Impact</span></div>
+        </div>
+
+        <div class="tip-group slide-up">
+          <div class="tip-group-header">
+            <div class="tip-icon-wrap tip-icon-digital">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <h3>Reduce Screen Time</h3>
+          </div>
+          <div class="tips-list">
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Designate screen-free zones, such as the dining table.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Switch to 'Night Shift' or 'Grayscale' mode in the evenings.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Try a 'Digital Sunset'—no devices 60 minutes before bed.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Engage in non-digital hobbies like gardening or painting.</p></div>
+          </div>
+          <div class="tip-footer"><span class="tip-footer-goal">✦ Daily Goal</span><span class="tip-footer-impact">High Impact</span></div>
+        </div>
+
+        <div class="tip-group slide-up">
+          <div class="tip-group-header">
+            <div class="tip-icon-wrap tip-icon-stress">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <h3>Manage Stress</h3>
+          </div>
+          <div class="tips-list">
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Practice 'Box Breathing': inhale 4s, hold 4s, exhale 4s, hold 4s.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Spend at least 15 minutes outdoors in natural light.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Start a gratitude journal—write down 3 things you're thankful for daily.</p></div>
+            <div class="tip-item"><div class="tip-check"><div class="tip-check-dot"></div></div><p>Connect with a friend or loved one for a brief conversation.</p></div>
+          </div>
+          <div class="tip-footer"><span class="tip-footer-goal">✦ Daily Goal</span><span class="tip-footer-impact">High Impact</span></div>
+        </div>
+      </div>
+    </div><!-- /#page-tips -->
+
+
+    <!-- ─────────────────────────
+         PAGE: GP FINDER
+    ───────────────────────────── -->
+    <div id="page-gp-finder" class="page container">
+      <header class="page-header page-header-center">
+        <h1>Find a GP near you</h1>
+        <p>Need professional medical advice? Enter your UK postcode to find your nearest General Practice on the NHS network.</p>
+      </header>
+
+      <div class="card gp-search-card">
+        <div class="gp-search-bar">
+          <div class="gp-postcode-wrap">
+            <svg class="icon gp-postcode-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <input type="text" id="gp-postcode" class="form-input gp-postcode-input" placeholder="Enter UK Postcode (e.g. SE1 7PB)">
+          </div>
+          <button id="gp-search" class="btn-primary">
+            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Search
+          </button>
+        </div>
+        <div id="gp-results">
+          <div class="gp-empty-state">
+            <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <p>Search to view local GP network</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="steps-section">
+        <div>
+          <div class="steps-header">
+            <div class="steps-icon">
+              <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            </div>
+            <h2>Steps to Register</h2>
+          </div>
+          <div class="steps-grid">
+            <div class="step-item"><span class="step-num">01</span><p>Choose a GP surgery from the list above.</p></div>
+            <div class="step-item"><span class="step-num">02</span><p>Contact them via phone or visit their website.</p></div>
+            <div class="step-item"><span class="step-num">03</span><p>Fill in the registration form (GMS1).</p></div>
+            <div class="step-item"><span class="step-num">04</span><p>You do not need proof of ID or address to register.</p></div>
+          </div>
+          <a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="nhs-link">
+            Full NHS Guide
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+        <div class="rights-panel">
+          <div class="rights-header">
+            <div class="rights-icon">
+              <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </div>
+            <h4>Your Rights</h4>
+          </div>
+          <p>In England, anyone can register with a GP surgery. You do not need proof of address or immigration status, ID or an NHS number.</p>
+        </div>
+      </div>
+    </div><!-- /#page-gp-finder -->
+
+
+    <!-- ─────────────────────────
+         PAGE: BRAIN & BODY
+    ───────────────────────────── -->
+    <div id="page-brain-body" class="page container">
+      <div class="dna-helix dna-helix-bb" id="dna-bb"></div>
+
+      <header class="bb-header">
+        <h1>The <span class="text-primary text-italic">Dual Sync</span>:<br>Brain &amp; Body Harmony</h1>
+        <p>We often separate mental and physical health, but the systems are deeply intertwined.</p>
+      </header>
+
+      <section class="bb-grid">
+        <div>
+          <div class="bb-item slide-up">
+            <div class="bb-icon bb-icon-cognitive">
+              <svg class="icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+            </div>
+            <div>
+              <h3>Focus &amp; Clarity</h3>
+              <p>Your ability to concentrate is directly linked to your sleep consistency and hydration. Dehydration of just 1% can reduce cognitive performance by 10%.</p>
+              <div class="bb-tags">
+                <span class="bb-tag">Drink water every 2 hours</span>
+                <span class="bb-tag">Limit screen use early in the morning</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bb-item slide-up">
+            <div class="bb-icon bb-icon-physical">
+              <svg class="icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"/><line x1="22" y1="11" x2="22" y2="13"/></svg>
+            </div>
+            <div>
+              <h3>Energy &amp; Vitality</h3>
+              <p>Physical movement triggers the release of endorphins and improves mitochondrial efficiency. Even a 10-minute walk can lift sluggishness better than caffeine.</p>
+              <div class="bb-tags">
+                <span class="bb-tag">Take the stairs</span>
+                <span class="bb-tag">Brisk 10-minute walk after lunch</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bb-item slide-up">
+            <div class="bb-icon bb-icon-mental">
+              <svg class="icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>
+            </div>
+            <div>
+              <h3>Mood &amp; Resilience</h3>
+              <p>Chronic stress and high work hours elevate cortisol, which can lead to anxiety. Routine habits provide an 'anchor' for your mental well-being.</p>
+              <div class="bb-tags">
+                <span class="bb-tag">Practice 4-7-8 breathing</span>
+                <span class="bb-tag">Journal for 5 minutes at night</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bb-sticky">
+          <div class="card-xl bb-warning-card">
+            <div class="bb-warning-icons">
+              <div class="bb-warning-heart">
+                <svg class="icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <div class="ping"></div>
+              </div>
+              <div class="bb-warning-brain">
+                <svg class="icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.44-4.14Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.44-4.14Z"/></svg>
+              </div>
+            </div>
+            <h4 class="bb-warning-title">Early Warning Signs</h4>
+            <div class="warning-item"><div class="warning-dot"></div><span>Persistent mid-afternoon fatigue</span></div>
+            <div class="warning-item"><div class="warning-dot"></div><span>Difficulty falling asleep before midnight</span></div>
+            <div class="warning-item"><div class="warning-dot"></div><span>Reduced focus on complex tasks</span></div>
+            <div class="warning-item"><div class="warning-dot"></div><span>Irritability during busy work weeks</span></div>
+            <p class="bb-warning-note">Note: These signs are common and often linked to routine gaps. If symptoms persist, consult a medical professional.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Condition Awareness -->
+      <section class="cond-section">
+        <div class="bio-pattern cond-bg-pattern"></div>
+        <div class="cond-content">
+          <div class="section-badge">
+            <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>
+            Aware &amp; Informed
+          </div>
+          <h2>Condition Awareness</h2>
+          <p>Understand how routine disruptions can manifest as common physiological conditions.</p>
+          <div class="cond-grid" id="cond-grid">
+            <!-- Conditions rendered by JS from HEALTH_CONTENT data -->
+          </div>
+        </div>
+      </section>
+
+      <section class="inspire-section">
+        <div class="inspire-icon">
+          <svg class="icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+        </div>
+        <h2>Small actions, major shifts.</h2>
+        <p>Wellness isn't about grand transformations—it's about the 1% changes. Drink that glass of water. Go for that 5-minute walk. Your brain will thank you.</p>
+      </section>
+    </div><!-- /#page-brain-body -->
+
+
+    <!-- ─────────────────────────
+         PAGE: ABOUT
+    ───────────────────────────── -->
+    <div id="page-about" class="page container">
+      <header class="about-header">
+        <div>
+          <h1>Pioneering <span class="text-primary text-italic">Health Clarity</span>.</h1>
+          <p>E Health Map is a digital awareness platform designed to bridge the gap between daily behaviors and long-term health literacy.</p>
+        </div>
+        <div class="about-img-pos">
+          <div class="about-img-wrap">
+            <img src="https://picsum.photos/seed/medical-tech/800/500" alt="Medical Technology" referrerpolicy="no-referrer">
+          </div>
+          <div class="about-img-glow"></div>
+        </div>
+      </header>
+
+      <div class="about-2col">
+        <div class="about-cards-col">
+          <div class="about-card">
+            <div class="about-card-img"><img src="https://picsum.photos/seed/vitality/600/300" alt="Our Purpose" referrerpolicy="no-referrer"></div>
+            <div class="about-card-body">
+              <div class="about-icon about-icon-teal">
+                <svg class="icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              </div>
+              <h3>Our Purpose</h3>
+              <p>To empower individuals with actionable habit insights. We believe that awareness is the first step toward lasting vitality. By visualizing the correlation between rest, fuel, and activity, users can make more informed lifestyle choices.</p>
+            </div>
+          </div>
+
+          <div class="about-card">
+            <div class="about-card-img"><img src="https://picsum.photos/seed/community/600/300" alt="Target Users" referrerpolicy="no-referrer"></div>
+            <div class="about-card-body">
+              <div class="about-icon about-icon-accent">
+                <svg class="icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <h3>Target Users</h3>
+              <p>From busy professionals managing high cognitive loads to anyone looking to improve their daily energy. E Health Map is for those who want a calm, supportive mirror of their current routines.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-problem-col">
+          <h2 class="problem-title">The Problem we Solve</h2>
+          <div class="problem-items">
+            <div class="problem-item">
+              <div class="problem-dot"></div>
+              <div>
+                <h4>Information Overload</h4>
+                <p>Simplifying health guidelines into actionable daily metrics.</p>
+              </div>
+            </div>
+            <div class="problem-item">
+              <div class="problem-dot"></div>
+              <div>
+                <h4>Invisible Habits</h4>
+                <p>Revealing patterns that go unnoticed in the rush of daily life.</p>
+              </div>
+            </div>
+            <div class="problem-item">
+              <div class="problem-dot"></div>
+              <div>
+                <h4>Non-Medical Hub</h4>
+                <p>Providing a safe, educational space for reflection without clinical pressure.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="disclaimer-box">
+        <div class="disclaimer-box-icon">
+          <svg class="icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div>
+          <h2>Important Disclaimer</h2>
+          <p class="disclaimer-bold">E Health Map is NOT a medical device and should not be used for self-diagnosis of any health condition.</p>
+          <p>The scores, insights, and patterns generated by our engines are based on general health guidelines and should be used for educational awareness purposes only. If you are concerned about your health, please consult a qualified GP or medical professional.</p>
+          <p>All logic assumes "typical" healthy adult baselines. Individual requirements vary by age, genetics, and existing medical conditions.</p>
+        </div>
+      </div>
+    </div><!-- /#page-about -->
+
+
+    <!-- ─────────────────────────
+         PAGE: CONTACT
+    ───────────────────────────── -->
+    <div id="page-contact" class="page container">
+      <header class="page-header page-header-center">
+        <h1>Get in Touch</h1>
+        <p>Have feedback or questions about E Health Map? We'd love to hear from you.</p>
+      </header>
+
+      <div class="contact-grid">
+        <div>
+          <h3 class="contact-section-title">Contact Information</h3>
+          <p class="contact-intro">We are a team of health awareness advocates dedicated to improving digital health literacy.</p>
+
+          <div class="contact-info-card">
+            <div class="contact-icon contact-icon-mail">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <div class="contact-lbl">Email</div>
+              <div class="contact-val contact-val-underline">hello@ehealthmap.co.uk</div>
+            </div>
+          </div>
+
+          <div class="contact-info-card">
+            <div class="contact-icon contact-icon-location">
+              <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div class="contact-lbl">Location</div>
+              <div class="contact-val">London, United Kingdom</div>
+            </div>
+          </div>
+
+          <div class="data-tip">
+            <h4 class="data-tip-title">
+              Data Transparency
+              <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </h4>
+            <p>Your contact details are used solely to reply to your inquiry and are never shared with third parties.</p>
+          </div>
+        </div>
+
+        <div class="contact-form-wrap">
+          <div id="contact-form-area">
+            <div class="form-group">
+              <span class="form-label">Full Name</span>
+              <input type="text" class="form-input" id="c-name" placeholder="John Doe" required>
+            </div>
+            <div class="form-group">
+              <span class="form-label">Email Address</span>
+              <input type="email" class="form-input" id="c-email" placeholder="john@example.com" required>
+            </div>
+            <div class="form-group">
+              <span class="form-label">Message</span>
+              <textarea class="form-input" id="c-msg" rows="5" placeholder="How can we help?"></textarea>
+            </div>
+            <button class="btn-primary btn-full" id="contact-submit">
+              <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Send Message
+            </button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#page-contact -->
+
+
+    <!-- ─────────────────────────
+         PAGE: LOGIN / AUTH
+    ───────────────────────────── -->
+    <div id="page-login" class="page container">
+      <div class="auth-wrap">
+        <div class="blob blob-teal blob-auth-teal"></div>
+        <div class="blob blob-purple blob-auth-purple"></div>
+
+        <div class="auth-grid" id="auth-grid">
+          <div class="fade-in" id="auth-left">
+            <div class="auth-left-icon">
+              <svg class="icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l1.5-3 2 5 1.5-3h5.28"/></svg>
+            </div>
+            <h1 id="auth-heading">Welcome back to<br><span class="text-primary text-italic">E Health</span> Map</h1>
+            <p id="auth-subheading">Securely track your vitals, habits, and cognitive load with our professional mapping tools.</p>
+            <div class="auth-features">
+              <div class="auth-feature">
+                <div class="auth-feature-icon">
+                  <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                </div>
+                <span class="auth-feature-text">Privacy-focused tracking</span>
+              </div>
+              <div class="auth-feature">
+                <div class="auth-feature-icon">
+                  <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </div>
+                <span class="auth-feature-text">Professional habit insights</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="auth-card slide-up">
+            <div class="auth-card-header">
+              <h2 id="auth-form-title">Login</h2>
+              <p>Enter your details to manage your professional health profile.</p>
+            </div>
+            <div class="form-group" id="auth-name-group" style="display:none">
+              <span class="form-label">Full Name</span>
+              <div class="input-icon-wrap">
+                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" class="form-input" id="auth-name" placeholder="John Doe">
+              </div>
+            </div>
+            <div class="form-group">
+              <span class="form-label">Email Address</span>
+              <div class="input-icon-wrap">
+                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <input type="email" class="form-input" id="auth-email" placeholder="name@example.com">
+              </div>
+            </div>
+            <button class="btn-primary btn-full" id="auth-submit">
+              Access Profile
+              <svg class="icon" id="auth-btn-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+            <div class="auth-toggle">
+              <button id="auth-switch">Don't have an account? Join now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#page-login -->
+
+
+    <!-- ─────────────────────────
+         PAGE: PROFILE
+    ───────────────────────────── -->
+    <div id="page-profile" class="page container">
+      <div id="profile-content">
+        <!-- Injected by JS when user is logged in -->
+        <div class="empty-state fade-in" id="profile-logged-out">
+          <div class="empty-icon">
+            <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <h1>Not logged in</h1>
+            <p>Please log in to view and manage your health profile.</p>
+          </div>
+          <a href="#login" class="btn-primary">Go to Login</a>
+        </div>
+      </div>
+    </div><!-- /#page-profile -->
+
+    <!-- ─────────────────────────
+         PAGE: DASHBOARD (data-driven)
+    ───────────────────────────── -->
+    <div id="page-dashboard" class="page container"></div>
+
+  </main>
+
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <div class="logo-icon logo-icon-lg">
+            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+          <span class="footer-brand-name">E <span class="logo-italic">Health</span> Map</span>
+        </div>
+        <p class="footer-tagline">This website is for general health awareness only and does not provide medical diagnosis or treatment.</p>
+      </div>
+
+      <div class="footer-cols">
+        <div class="footer-links">
+          <span>Explore</span>
+          <a href="#routine">Routine Check</a>
+          <a href="#insights">Insights</a>
+          <a href="#tips">Health Tips</a>
+        </div>
+        <div class="footer-links">
+          <span>Support</span>
+          <a href="#about">About Us</a>
+          <a href="#contact">Contact</a>
+          <a href="#gp-finder">Find GP</a>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <span>Reference</span>
+        <p class="footer-reference">NHS UK &amp; WHO Guidelines</p>
+        <p class="footer-copyright">&copy; <span id="year"></span> E Health Map. Professional Edition.</p>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /#app -->
+
+
+<!-- ══════════════════════════════════════
+     RESET DATA MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="reset-modal">
+  <div class="modal-box">
+    <div class="modal-icon-wrap">
+      <svg class="icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9"  x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <div class="modal-body">
+      <h3>Clear All Data?</h3>
+      <p>This will permanently delete all your daily logs, habit history, and reset your wellness scores. This action <span class="text-danger">cannot be undone</span>.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="modal-cancel" class="modal-btn-cancel">Cancel</button>
+      <button id="modal-confirm" class="modal-btn-confirm">Delete Everything</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     APP SCRIPTS (order matters)
+══════════════════════════════════════ -->
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/pages.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
